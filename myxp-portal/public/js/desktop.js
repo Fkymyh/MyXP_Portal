@@ -59,8 +59,18 @@ function openApp(appId) {
     content.className = "window-content";
 
     let notesController;
+
     if (appId === "memo") {
         notesController = mountNotes(content);
+    } else if (appId === "movies") {
+        const iframe = document.createElement("iframe");
+
+        iframe.src = "movie.php";
+        iframe.title = "映画情報";
+        iframe.className = "movie-frame";
+
+        content.classList.add("movie-content");
+        content.append(iframe);
     } else {
         const message = document.createElement("p");
         message.textContent = `${appNames[appId]}は開発予定です。`;
