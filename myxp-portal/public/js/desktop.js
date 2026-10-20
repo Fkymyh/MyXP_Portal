@@ -58,10 +58,9 @@ function openApp(appId) {
     const content = document.createElement("div");
     content.className = "window-content";
 
+    let notesController;
     if (appId === "memo") {
-        const textarea = document.createElement("textarea");
-        textarea.placeholder = "ここにメモを入力...";
-        content.append(textarea);
+        notesController = mountNotes(content);
     } else {
         const message = document.createElement("p");
         message.textContent = `${appNames[appId]}は開発予定です。`;
@@ -77,8 +76,12 @@ function openApp(appId) {
     taskbarApps.append(taskButton);
 
     taskButton.addEventListener("click", () => {
-        win.hidden = !win.hidden;
-        if (!win.hidden) bringToFront(win);
+        if (win.hidden || Number(win.style.zIndex) !== highestZIndex) {
+            win.hidden = false;
+            bringToFront(win);
+        } else {
+            win.hidden = true;
+        }
     });
 
     minimize.addEventListener("click", () => {
@@ -86,6 +89,7 @@ function openApp(appId) {
     });
 
     close.addEventListener("click", () => {
+        if (notesController && !notesController.close()) return;
         win.remove();
         taskButton.remove();
     });
@@ -118,7 +122,7 @@ function openApp(appId) {
     let offsetY = 0;
 
     titlebar.addEventListener("pointerdown", (e) => {
-        if (e.target.closest("button") || maximized) return;
+        if (e.button !== 0 || e.target.closest("button") || maximized) return;
 
         dragging = true;
 
@@ -157,6 +161,9 @@ function openApp(appId) {
     titlebar.addEventListener("pointercancel", () => {
         dragging = false;
     });
+    titlebar.addEventListener("lostpointercapture", () => {
+        dragging = false;
+    });
 }
 
 function bringToFront(win) {
@@ -174,11 +181,34 @@ document.querySelectorAll("[data-app]").forEach(button => {
             openApp(button.dataset.app);
             startMenu.hidden = true;
         });
+    } else {
+        button.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openApp(button.dataset.app);
+            }
+        });
     }
 });
 
 startButton.addEventListener("click", () => {
     startMenu.hidden = !startMenu.hidden;
+});
+
+document.addEventListener("pointerdown", (event) => {
+    if (!startMenu.contains(event.target) && !startButton.contains(event.target)) {
+        startMenu.hidden = true;
+    }
+});
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") startMenu.hidden = true;
+});
+window.addEventListener("resize", () => {
+    document.querySelectorAll(".xp-window").forEach(win => {
+        const desktop = document.getElementById("desktop");
+        win.style.left = `${Math.max(0, Math.min(win.offsetLeft, desktop.clientWidth - win.offsetWidth))}px`;
+        win.style.top = `${Math.max(0, Math.min(win.offsetTop, desktop.clientHeight - win.offsetHeight))}px`;
+    });
 });
 
 function updateClock() {

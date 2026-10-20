@@ -44,8 +44,8 @@ $apps = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyXP Portal</title>
     <link rel="stylesheet" href="css/style.css">
-    <acript src="js/desktop.js" defer>
-        </script>
+    <script src="js/notes.js" defer></script>
+    <script src="js/desktop.js" defer></script>
 </head>
 
 <body>
