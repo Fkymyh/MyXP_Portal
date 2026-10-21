@@ -7,8 +7,19 @@ require_once __DIR__ . '/../src/Movie.php';
 $movie = null;
 $error = null;
 
+// URLの「?id=11」の値を取得します。指定がなければ11を使います。
+$movieId = filter_var(
+    $_GET['id'] ?? '11',
+    FILTER_VALIDATE_INT,
+    ['options' => ['min_range' => 1]]
+);
+
 try {
-    $movie = fetchMovie(11);
+    if ($movieId === false) {
+        throw new InvalidArgumentException('映画IDが正しくありません。');
+    }
+
+    $movie = fetchmovie($movieId);
 } catch (Exception $e) {
     $error = '映画情報を取得できませんでした。時間を置いて再試行してください。';
 }
@@ -32,6 +43,21 @@ function escape(string $value): string
 <body>
     <h1>映画情報</h1>
 
+    <form action="movie.php" method="get">
+        <label for="movie-id">映画ID：</label>
+
+        <input
+            type="number"
+            id="movie-id"
+            name="id"
+            min="1"
+            step="1"
+            value="<?= escape((string) ($movieId === false ? '' :
+                        $movieId)) ?>"
+            required>
+
+        <button type="submit">表示</button>
+    </form>
     <?php if ($error !== null): ?>
         <p><?= escape($error) ?></p>
     <?php elseif ($movie !== null): ?>
