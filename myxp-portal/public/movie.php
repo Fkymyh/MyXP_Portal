@@ -41,6 +41,7 @@ function escape(string $value): string
 </head>
 
 <body>
+    <p><a href="movie-search.php">映画検索へ戻る</a></p>
     <h1>映画情報</h1>
 
     <form action="movie.php" method="get">

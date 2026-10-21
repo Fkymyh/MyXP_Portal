@@ -65,7 +65,7 @@ function openApp(appId) {
     } else if (appId === "movies") {
         const iframe = document.createElement("iframe");
 
-        iframe.src = "movie.php";
+        iframe.src = "movie-search.php";
         iframe.title = "映画情報";
         iframe.className = "movie-frame";
 
