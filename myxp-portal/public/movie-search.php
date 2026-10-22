@@ -63,7 +63,22 @@ function escape(string $value): string
         <ul>
             <?php foreach ($movies as $movie): ?>
                 <li>
-                    <a href="movie.php?id=<?= (int) $movie['id'] ?>">
+                    <?php $posterPath = $movie['poster_path'] ?? null; ?>
+
+                    <?php if (is_string($posterPath) && $posterPath !== ''): ?>
+                        <img
+                            src="<?= escape('https://image.tmdb.org/t/p/w500' . $posterPath) ?>"
+                            alt=""
+                            width="80"
+                            style="height: auto; vertical-align: middle;"
+                            loading="lazy">
+                    <?php else: ?>
+                        <span>画像なし</span>
+                    <?php endif; ?>
+                    <a href="movie.php?<?= escape(http_build_query([
+                                            'id' => (int) $movie['id'],
+                                            'query' => $query,
+                                        ])) ?>">
                         <?= escape($movie['title'] ?? 'タイトル不明') ?>
                     </a>
 

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../src/Movie.php';
 
+$searchInput = $_GET['query'] ?? '';
+$searchQuery = is_string($searchInput) ? trim($searchInput) : '';
+
 $movie = null;
 $error = null;
 
@@ -41,7 +44,13 @@ function escape(string $value): string
 </head>
 
 <body>
-    <p><a href="movie-search.php">映画検索へ戻る</a></p>
+    <p>
+        <a href="movie-search.php?<?= escape(http_build_query([
+                                        'query' => $searchQuery,
+                                    ])) ?>">
+            映画検索へ戻る
+        </a>
+    </p>
     <h1>映画情報</h1>
 
     <form action="movie.php" method="get">
@@ -63,6 +72,17 @@ function escape(string $value): string
         <p><?= escape($error) ?></p>
     <?php elseif ($movie !== null): ?>
         <h2><?= escape($movie['title'] ?? '不明') ?></h2>
+        <?php $posterPath = $movie['poster_path'] ?? null; ?>
+
+        <?php if (is_string($posterPath) && $posterPath !== ''): ?>
+            <img
+                src="<?= escape('https://image.tmdb.org/t/p/w500' . $posterPath) ?>"
+                alt="<?= escape(($movie['title'] ?? '映画') . 'のポスター') ?>"
+                width="250"
+                style="max-width: 100%; height: auto;">
+        <?php else: ?>
+            <p>ポスター画像はありません</p>
+        <?php endif; ?>
 
         <p>
             公開日：<?= escape($movie['release_date'] ?? '不明') ?>
